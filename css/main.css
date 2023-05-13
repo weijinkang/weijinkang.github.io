@@ -1245,6 +1245,9 @@ i.iconfont {
 #remark-km423lmfdslkm34-node {
   z-index: 1031;
 }
+.vpower.txt-right {
+  display: none;
+}
 .markdown-body .highlight pre,
 .markdown-body pre {
   padding: 1.45rem 1rem;
