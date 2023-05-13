@@ -18,16 +18,16 @@
   <meta name="author" content="Jinkang_Wei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="一、什么是机器学习在解释机器学习之前，我们先想想什么是学习？学习是从观察（视觉、听觉和触觉等）出发，经过大脑的内化过程变成有用的技巧、技能。    机器学习则是把学习的主体替换为计算机。即计算机利用数据通过某种模型或学习算法来增进某种表现。如下图所示。其中数据是多样的。包括存在于计算机及网络上的各种数字、文字、图像、视频数据以及它们的组合。机器学习即设计一种“模型”，通过输入的数据来训练模型，产生">
+    <meta name="description" content="机器学习的定义、基本概念及模型的评估方法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="机器学习概述">
 <meta property="og:url" content="http://example.com/2019/03/28/overview-of-machine-learning/index.html">
 <meta property="og:site_name" content="Jinkang">
-<meta property="og:description" content="一、什么是机器学习在解释机器学习之前，我们先想想什么是学习？学习是从观察（视觉、听觉和触觉等）出发，经过大脑的内化过程变成有用的技巧、技能。    机器学习则是把学习的主体替换为计算机。即计算机利用数据通过某种模型或学习算法来增进某种表现。如下图所示。其中数据是多样的。包括存在于计算机及网络上的各种数字、文字、图像、视频数据以及它们的组合。机器学习即设计一种“模型”，通过输入的数据来训练模型，产生">
+<meta property="og:description" content="机器学习的定义、基本概念及模型的评估方法">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/overview-of-machine-learning.jpg">
 <meta property="article:published_time" content="2019-03-28T08:50:00.000Z">
-<meta property="article:modified_time" content="2023-05-13T12:47:47.510Z">
+<meta property="article:modified_time" content="2023-05-13T13:46:11.157Z">
 <meta property="article:author" content="Jinkang_Wei">
 <meta property="article:tag" content="机器学习">
 <meta name="twitter:card" content="summary_large_image">
@@ -241,7 +241,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          2.1k 字
         
       </span>
     
@@ -252,7 +252,7 @@
         
         
         
-          17 分钟
+          18 分钟
         
       </span>
     
@@ -304,14 +304,11 @@
               <div class="markdown-body">
                 
                 <h1 id="一、什么是机器学习"><a href="#一、什么是机器学习" class="headerlink" title="一、什么是机器学习"></a>一、什么是机器学习</h1><p>在解释机器学习之前，我们先想想什么是学习？学习是从观察（视觉、听觉和触觉等）出发，经过大脑的内化过程变成有用的技巧、技能。</p>
-<hr>
-<p><img src="/2019/03/28/overview-of-machine-learning/the-process-of-learnig.jpg" srcset="/img/loading.gif" lazyload alt="学习的过程"></p>
-<hr>
-<p>机器学习则是把学习的主体替换为计算机。即计算机利用数据通过某种模型或学习算法来增进某种表现。如下图所示。其中<strong>数据</strong>是多样的。包括存在于计算机及网络上的各种数字、文字、图像、视频数据以及它们的组合。<strong>机器学习</strong>即设计一种“模型”，通过输入的数据来训练模型，产生一个适用于该输入数据的模型来增进某种<strong>性能</strong>（即当有新的数据到来时，该模型可以较好地进行预测或判断)。</p>
+<p>机器学习则是把学习的主体替换为计算机。即<u>计算机利用数据通过某种模型或学习算法来增进某种表现</u>。如下图所示。其中<strong>数据</strong>是多样的。包括存在于计算机及网络上的各种数字、文字、图像、视频数据以及它们的组合。<strong>机器学习</strong>即设计一种“模型”，通过输入的数据来训练模型，产生一个适用于该输入数据的模型来增进某种<strong>性能</strong>（即当有新的数据到来时，该模型可以较好地进行预测或判断)。</p>
 <p>Tom Mitchell对机器学习进行了如下定义：给定一个任务 T，一个性能测量方法 P，在经验 E 影响下，P 对 T 的测量结构得到了改进。</p>
-<h1 id="二、机器学习基本概念"><a href="#二、机器学习基本概念" class="headerlink" title="二、机器学习基本概念"></a>二、机器学习基本概念</h1><h2 id="1-数据"><a href="#1-数据" class="headerlink" title="1. 数据"></a>1. 数据</h2><p>机器学习的对象是数据（data）。我们把用来训练和测试模型的全部数据称为数据集（data set）。数据集是由若干个“<strong>样本</strong>”（sample）构成。能反应样本中某方面表现或性能的事项称为“<strong>特征</strong>”（feature）。特征上的取值称为<strong>特征值</strong>。由特征张成的空间称为“<strong>特征空间</strong>”。关于样本结果的信息称为“<strong>标记</strong>”（label）。所有标记的集合称为“<strong>输出空间</strong>”拥有标记信息的示例称为“<strong>样例</strong>”（example）。我们以预测狗的类别作为例子解释上面的术语。想一想我们平常是怎么判断一只狗的类别的？我们可以通过体型、叫声、毛色来判断吧。这时体型、叫声、毛色就是特征。特征空间则可以想象为把体型作为轴、叫声作为轴、毛色作为轴所形成的三维空间。特征值为这三维空间中某一点的坐标位置。标记即为狗的类别（是哈士奇还是泰迪）。数据集可分为训练数据、验证数据和测试数据。训练数据和验证数据是在训练过程中需要用到的数据，其中训练数据更新参数，验证数据更新超参数。测试数据用来评价模型的泛化能力。</p>
+<h1 id="二、机器学习基本概念"><a href="#二、机器学习基本概念" class="headerlink" title="二、机器学习基本概念"></a>二、机器学习基本概念</h1><h2 id="1-数据"><a href="#1-数据" class="headerlink" title="1. 数据"></a>1. 数据</h2><p>机器学习的对象是数据（data）。我们把用来训练和测试模型的全部数据称为数据集（data set）。数据集是由若干个“<strong>样本</strong>”（sample）构成。能反应样本中某方面表现或性能的事项称为“<strong>特征</strong>”（feature）。特征上的取值称为<strong>特征值</strong>。由特征张成的空间称为“<strong>特征空间</strong>”。关于样本结果的信息称为“<strong>标记</strong>”（label）。所有标记的集合称为“<strong>输出空间</strong>”拥有标记信息的示例称为“<strong>样例</strong>”（example）。<font face="kaiti">我们以预测狗的类别作为例子解释上面的术语。想一想我们平常是怎么判断一只狗的类别的？我们可以通过体型、叫声、毛色来判断吧。这时体型、叫声、毛色就是特征。特征空间则可以想象为把体型作为轴、叫声作为轴、毛色作为轴所形成的三维空间。特征值为这三维空间中某一点的坐标位置。标记即为狗的类别（是哈士奇还是泰迪）。</font>数据集可分为训练数据、验证数据和测试数据。训练数据和验证数据是在训练过程中需要用到的数据，其中训练数据更新参数，验证数据更新超参数。测试数据用来评价模型的泛化能力。</p>
 <h2 id="2-机器学习"><a href="#2-机器学习" class="headerlink" title="2. 机器学习"></a>2. 机器学习</h2><p>机器学习的目的是对新的数据进行预测和分析。机器学习可以分为监督学习（supervised learning）、非监督学习（unsupervised learning）、半监督学习（semi-supervised learning）和强化学习（reinforcement learning）。简单地区分就是，监督学习的每一个样本都对应一个标记；非监督学习没有标记；半监督学习则介于监督和非监督之间，有些样本有标记有些没有。</p>
-<p>虽然机器学习的算法多种多样，但都每一种算法都离不开三样东西：模型（model）、策略（strategy）和算法（algorithm）。下面以监督学习讲一讲这三个东西。</p>
+<p>虽然机器学习的算法多种多样，但都每一种算法都离不开三样东西：模型（model）、策略（strategy）和算法（algorithm）。下面以监督学习讲一讲这三个东西。<br>$$<br>P(x) &#x3D; \frac{1}{ \sqrt{2} }<br>$$</p>
 <h3 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h3><p>监督学习中的模型就是所要学习的条件概率分布或决策函数。所有可能的条件概率和决策函数构成了模型<strong>假设空间</strong>（hypothesis space）。机器学习就是在假设空间中找到一个函数可以拟合所有的训练数据并且在测试数据中的误差很小（即泛化能力强）。这时，我们可以通过训练误差和测试误差来对模型进行评估。</p>
 <p>训练误差的计算。对所有的训练数据中的数据                                ，假设样本个数为  ，给定一个预测的函数  （即模型），则预测结果为  （一般预测值都会在上方加个帽子）。定义一个损失函数  ，通过将输出值（标记）  与预测值  作比较，得到训练误差：</p>
 <p>同样的，测试误差只是把样本换成了测试数据集中的样本。</p>
