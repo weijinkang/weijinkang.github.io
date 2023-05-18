@@ -18,25 +18,24 @@
   <meta name="author" content="Jinkang_Wei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+    <meta name="description" content="开启Intel C-States会导致电脑每隔一段时间就蓝屏死机">
 <meta property="og:type" content="article">
-<meta property="og:title" content="解决云服务器无法访问ChatGPT的问题">
-<meta property="og:url" content="https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/index.html">
+<meta property="og:title" content="一个电脑不断蓝屏死机的问题">
+<meta property="og:url" content="https://weijinkang.github.io/2022/09/01/resolve-computer-crashes/index.html">
 <meta property="og:site_name" content="Jinkang">
-<meta property="og:description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+<meta property="og:description" content="开启Intel C-States会导致电脑每隔一段时间就蓝屏死机">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
-<meta property="article:published_time" content="2023-05-17T13:41:56.000Z">
-<meta property="article:modified_time" content="2023-05-18T15:44:15.894Z">
+<meta property="og:image" content="https://weijinkang.github.io/img/resolve-computer-crashes.jpg">
+<meta property="article:published_time" content="2022-09-01T14:05:35.000Z">
+<meta property="article:modified_time" content="2023-05-18T16:03:09.165Z">
 <meta property="article:author" content="Jinkang_Wei">
-<meta property="article:tag" content="ChatGPT">
-<meta property="article:tag" content="服务器">
+<meta property="article:tag" content="bug">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
+<meta name="twitter:image" content="https://weijinkang.github.io/img/resolve-computer-crashes.jpg">
   
   
   
-  <title>解决云服务器无法访问ChatGPT的问题 - Jinkang</title>
+  <title>一个电脑不断蓝屏死机的问题 - Jinkang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -223,7 +222,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">解决云服务器无法访问ChatGPT的问题</span>
+            <span id="subtitle">一个电脑不断蓝屏死机的问题</span>
           
         </div>
 
@@ -234,8 +233,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-05-17 21:41" pubdate>
-          2023年5月17日 晚上
+        <time datetime="2022-09-01 22:05" pubdate>
+          2022年9月1日 晚上
         </time>
       </span>
     
@@ -246,7 +245,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          1.1k 字
         
       </span>
     
@@ -257,7 +256,7 @@
         
         
         
-          18 分钟
+          10 分钟
         
       </span>
     
@@ -316,26 +315,46 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">解决云服务器无法访问ChatGPT的问题</h1>
+            <h1 style="display: none">一个电脑不断蓝屏死机的问题</h1>
             
             
               <div class="markdown-body">
                 
-                <p>很多人成功翻墙之后发现还是没法上ChatGPT，这很可能是因为ChatGPT限制了云服务器的IP造成的。</p>
-<p><img src="chatgpt_fail.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>要想解决这个问题，需要将云服务发到ChatGPT的数据再做一层封装。这层封装WARP可以帮我们完成。WARP是Cloudflare推出的一项网络加速服务，其设计的初衷是改善移动互联网的性能和安全性。大概的原理是客户端（此时的客户端是我们的云服务器）上来的流量经过WARP的加密封装后，自动寻找离客户端最近的Cloudflare网络的边缘节点，然后数据在该网络里路由到离服务器最近的边缘节点，最后解密后发给服务器端（也就是ChatGPT）。此时与ChatGPT交互报文的源IP不再是云服务器的IP，而是的Cloudflare边缘节点入口IP，而这个IP会被ChatGPT认为是一个普通的IP而不会遭到限制。</p>
-<p>所以解决方法是：从云服务器发出数据如果是发给ChatGPT的，那么把这个数据交给warp客户端再做一次代理，其它报文则正常转发。由于我的梯子是用v2ray搭的（见上一篇blog），所以接下来的教程是基于v2ray（其它梯子应该也差不多，理解了思想自己适配就好）。</p>
-<p>总体流程：</p>
-<p><img src="graph.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>搭建过程很简单，已经有人弄好了一键安装脚本（ <a target="_blank" rel="noopener" href="https://gitlab.com/rwkgyg/CFwarp">https://gitlab.com/rwkgyg/CFwarp</a> ），只需执行以下命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget -N https://gitlab.com/rwkgyg/CFwarp/raw/main/CFwarp.sh &amp;&amp; bash CFwarp.sh<br></code></pre></td></tr></table></figure>
-<p>按照提示进行下一步即可</p>
-<p><img src="warp_install.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>最后显示如下信息时表示warp已经搭建完成了，此时在云服务器命令行窗口出入<code>netstat -nlt</code>发现40000端口已经被warp监听了。</p>
-<p><img src="warp_install_successful.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>接下来是修改v2ray的配置文件<code>vim /usr/local/etc/v2ray/config.json</code>（想了解更多内容可参考<a target="_blank" rel="noopener" href="https://www.v2ray.com/">v2ray官方文档</a>）。要让访问ChatGPT的流量走warp代理，配置文件需要修改两个地方，一个是需要增加routing：让匹配到chat.openai.com的数据打上一个warp的outboundTag标签。未匹配到的打上default标签。另外一个是outbounds：带上warp标签的数据送到127.0.0.1:40000（也就是送给warp客户端），default标签的数据直接从云服务器转发出去。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;inbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">16832</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vmess&quot;</span><span class="hljs-punctuation">,</span>   <br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;clients&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>			<span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;uuid&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;alterId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;outbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;freedom&quot;</span><span class="hljs-punctuation">,</span>  <br>        <span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;socks&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;servers&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;address&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">40000</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;users&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;routing&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;domain&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;chat.openai.com&quot;</span><span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;network&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;udp,tcp&quot;</span><br>		<span class="hljs-punctuation">&#125;</span><br>		<span class="hljs-punctuation">]</span><br>	<span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
-<p>重启v2ray<code>systemctl restart v2ray</code>后就可以正常访问<a target="_blank" rel="noopener" href="https://chat.openai.com/">ChatGPT</a>啦！</p>
+                <p>现象：电脑不定期的会蓝屏死机</p>
+<p>先说以下解决方法：进入BIOS关掉 <strong>Intel C-States</strong>（一般在 高级→CPU设置→Power Management Control里）</p>
+<p>问题起因是去年国庆回来后把电脑从Windows10升到了Win11，并且进BIOS捣鼓了一些配置（后来我始终想不起来进过BIOS修改配置了，导致我很久没找到原因），然后就开始出现蓝屏蓝屏死机现象。按照网上给的解决方法都没用，我对最有可能导致我电脑蓝屏的问题做了试验：</p>
+<ol>
+<li>
+<p>软件问题（驱动或软件兼容性问题）</p>
+<ul>
+<li>
+<p>重装系统（ <font color="#dd0000">X</font> ）</p>
+<p>因为从我记忆中的现象来看，是win10升到11后才出现问题，所以先尝试把系统重装回win10。装系统过程非常难受，电脑总是在块安装完成的时候蓝屏，强制重启电脑后又得重来一遍。装回win10后还是会出现蓝屏。</p>
+</li>
+<li>
+<p>超频问题（ <font color="#dd0000">X</font> ）</p>
+<p>既然不是驱动/软件问题，那有可能是华硕主板的AI超频导致的。进BIOS关掉跟CPU，内存超频相关的配置。未解决蓝屏。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>硬件问题（接触不良或故障损坏）</p>
+<p>既然不是软件问题，那就去排除硬件。把下面的硬件（除了系统运行的固态硬盘外）用控制变量法逐一试验排除，发现不管移除那一项还是会蓝屏。</p>
+<ul>
+<li>内存接触不良（ <font color="#dd0000">X</font> ）</li>
+<li>内存（两块）损坏（ <font color="#dd0000">X</font> ）</li>
+<li>显卡损坏（ <font color="#dd0000">X</font> ）</li>
+<li>机械硬盘损坏（ <font color="#dd0000">X</font> ）</li>
+</ul>
+</li>
+</ol>
+<p>最终在我现有的知识体系中，只能得到这个结论：固态硬盘损坏，两块内存同时损坏。</p>
+<p>到这里已经没法解决了，只能将就着用着。</p>
+<p>后来有一天可能闲着没事，又去捣鼓BIOS。然后发现关闭Intel C-States后电脑居然不蓝屏了！！！（这个方法为啥直接搜电脑蓝屏搜不到？难道很少有人遇到这种情况的蓝屏？）</p>
+<p>为什么Intel C-States会导致蓝屏呢？那得先看看Intel C-States是什么：</p>
+<p><font face="kaiti">为了在 CPU 空闲时节约能源，可以使用命令让 CPU 进入低功耗模式。每个 CPU 都有几种功耗模式，它们统称为“C-State”或“C-模式”。这些模式的工作原理是降低 CPU 内空闲单元的时钟信号和功率。通过降低时钟信号和电压停止（甚至完全关闭）的 CPU 单元越多，功耗就越低。这些模式或“C-State”从 C0 开始，C0 表示“正常”的 CPU 运行模式（CPU 已 100% 激活）。C 后的数字越大，表示 CPU 进入休眠模式的程度越深。换言之，关闭的电路和时钟信号越多，完全唤醒 CPU 进入 C0 模式需要的时间越长。每个 C-State 模式均有对应名称，其中一些模式根据节能级别和唤醒时间不同，还具有相应子模式。</font></p>
+<p>所以猜测CPU在不同C-State切换的时候，对寄存器的切换、内存数据切换、设备状态保存重载出了问题？</p>
+<p>根本原因不清楚啦，反正最终还是解决电脑蓝屏的问题☺☺☺</p>
 
                 
               </div>
@@ -369,9 +388,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/ChatGPT/">#ChatGPT</a>
-      
-        <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">#服务器</a>
+        <a href="/tags/bug/">#bug</a>
       
     </div>
   
@@ -383,8 +400,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>解决云服务器无法访问ChatGPT的问题</div>
-      <div>https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/</div>
+      <div>一个电脑不断蓝屏死机的问题</div>
+      <div>https://weijinkang.github.io/2022/09/01/resolve-computer-crashes/</div>
     </div>
     <div class="license-meta">
       
@@ -396,7 +413,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年5月17日</div>
+          <div>2022年9月1日</div>
         </div>
       
       
@@ -440,12 +457,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2023/05/15/enjoy-free-internet/" title="搭建免费的梯子">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">搭建免费的梯子</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/05/15/enjoy-free-internet/" title="搭建免费的梯子">
-                        <span class="hidden-mobile">搭建免费的梯子</span>
+                      <a href="/2019/12/08/buid-blog-using-raspberry-pi/" title="使用树莓派搭建个人博客">
+                        <span class="hidden-mobile">使用树莓派搭建个人博客</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -521,19 +544,6 @@
 
   
 
-
-
-  <script>
-  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
-    mermaid.initialize({});
-
-    Fluid.events.registerRefreshCallback(function() {
-      if ('mermaid' in window) {
-        mermaid.init();
-      }
-    });
-  });
-</script>
 
 
 
