@@ -18,25 +18,22 @@
   <meta name="author" content="Jinkang_Wei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+    <meta name="description" content="编译OpenWRT">
 <meta property="og:type" content="article">
-<meta property="og:title" content="解决云服务器无法访问ChatGPT的问题">
-<meta property="og:url" content="https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/index.html">
+<meta property="og:title" content="从源码编译OpenWRT系统">
+<meta property="og:url" content="https://weijinkang.github.io/2023/06/04/build-openwrt/index.html">
 <meta property="og:site_name" content="Jinkang">
-<meta property="og:description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+<meta property="og:description" content="编译OpenWRT">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
-<meta property="article:published_time" content="2023-05-17T13:41:56.000Z">
-<meta property="article:modified_time" content="2023-05-18T15:44:15.894Z">
+<meta property="article:published_time" content="2023-06-04T14:50:41.000Z">
+<meta property="article:modified_time" content="2023-06-06T13:12:23.080Z">
 <meta property="article:author" content="Jinkang_Wei">
-<meta property="article:tag" content="ChatGPT">
-<meta property="article:tag" content="服务器">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
   
   
   
-  <title>解决云服务器无法访问ChatGPT的问题 - Jinkang</title>
+  <title>从源码编译OpenWRT系统 - Jinkang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -223,7 +220,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">解决云服务器无法访问ChatGPT的问题</span>
+            <span id="subtitle">从源码编译OpenWRT系统</span>
           
         </div>
 
@@ -234,8 +231,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-05-17 21:41" pubdate>
-          2023年5月17日 晚上
+        <time datetime="2023-06-04 22:50" pubdate>
+          2023年6月4日 晚上
         </time>
       </span>
     
@@ -246,7 +243,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          696 字
         
       </span>
     
@@ -257,7 +254,7 @@
         
         
         
-          18 分钟
+          6 分钟
         
       </span>
     
@@ -316,26 +313,39 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">解决云服务器无法访问ChatGPT的问题</h1>
+            <h1 style="display: none">从源码编译OpenWRT系统</h1>
             
             
               <div class="markdown-body">
                 
-                <p>很多人成功翻墙之后发现还是没法上ChatGPT，这很可能是因为ChatGPT限制了云服务器的IP造成的。</p>
-<p><img src="chatgpt_fail.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>要想解决这个问题，需要将云服务发到ChatGPT的数据再做一层封装。这层封装WARP可以帮我们完成。WARP是Cloudflare推出的一项网络加速服务，其设计的初衷是改善移动互联网的性能和安全性。大概的原理是客户端（此时的客户端是我们的云服务器）上来的流量经过WARP的加密封装后，自动寻找离客户端最近的Cloudflare网络的边缘节点，然后数据在该网络里路由到离服务器最近的边缘节点，最后解密后发给服务器端（也就是ChatGPT）。此时与ChatGPT交互报文的源IP不再是云服务器的IP，而是的Cloudflare边缘节点入口IP，而这个IP会被ChatGPT认为是一个普通的IP而不会遭到限制。</p>
-<p>所以解决方法是：从云服务器发出数据如果是发给ChatGPT的，那么把这个数据交给warp客户端再做一次代理，其它报文则正常转发。由于我的梯子是用v2ray搭的（见上一篇blog），所以接下来的教程是基于v2ray（其它梯子应该也差不多，理解了思想自己适配就好）。</p>
-<p>总体流程：</p>
-<p><img src="graph.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>搭建过程很简单，已经有人弄好了一键安装脚本（ <a target="_blank" rel="noopener" href="https://gitlab.com/rwkgyg/CFwarp">https://gitlab.com/rwkgyg/CFwarp</a> ），只需执行以下命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget -N https://gitlab.com/rwkgyg/CFwarp/raw/main/CFwarp.sh &amp;&amp; bash CFwarp.sh<br></code></pre></td></tr></table></figure>
-<p>按照提示进行下一步即可</p>
-<p><img src="warp_install.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>最后显示如下信息时表示warp已经搭建完成了，此时在云服务器命令行窗口出入<code>netstat -nlt</code>发现40000端口已经被warp监听了。</p>
-<p><img src="warp_install_successful.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>接下来是修改v2ray的配置文件<code>vim /usr/local/etc/v2ray/config.json</code>（想了解更多内容可参考<a target="_blank" rel="noopener" href="https://www.v2ray.com/">v2ray官方文档</a>）。要让访问ChatGPT的流量走warp代理，配置文件需要修改两个地方，一个是需要增加routing：让匹配到chat.openai.com的数据打上一个warp的outboundTag标签。未匹配到的打上default标签。另外一个是outbounds：带上warp标签的数据送到127.0.0.1:40000（也就是送给warp客户端），default标签的数据直接从云服务器转发出去。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;inbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">16832</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vmess&quot;</span><span class="hljs-punctuation">,</span>   <br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;clients&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>			<span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;uuid&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;alterId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;outbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;freedom&quot;</span><span class="hljs-punctuation">,</span>  <br>        <span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;socks&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;servers&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;address&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">40000</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;users&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;routing&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;domain&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;chat.openai.com&quot;</span><span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;network&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;udp,tcp&quot;</span><br>		<span class="hljs-punctuation">&#125;</span><br>		<span class="hljs-punctuation">]</span><br>	<span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
-<p>重启v2ray<code>systemctl restart v2ray</code>后就可以正常访问<a target="_blank" rel="noopener" href="https://chat.openai.com/">ChatGPT</a>啦！</p>
+                <h2 id="1-下载源码"><a class="markdownIt-Anchor" href="#1-下载源码"></a> 1. 下载源码</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> https://github.com/openwrt/openwrt.git<br></code></pre></td></tr></table></figure>
+<h2 id="2-安装所有可选的软件包"><a class="markdownIt-Anchor" href="#2-安装所有可选的软件包"></a> 2. 安装所有可选的软件包</h2>
+<p>进入openwrt根目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">./scripts/feeds update  	<span class="hljs-comment"># 更新最新的包定义</span><br>./scripts/feeds install -a  <span class="hljs-comment"># 安装所有的包</span><br></code></pre></td></tr></table></figure>
+<h2 id="3-检查编译工具是否齐备生成默认的编译配置文件"><a class="markdownIt-Anchor" href="#3-检查编译工具是否齐备生成默认的编译配置文件"></a> 3. 检查编译工具是否齐备，生成默认的编译配置文件</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make defconfig<br></code></pre></td></tr></table></figure>
+<h2 id="4-进入配置工具选项菜单来配置编译固件的内容"><a class="markdownIt-Anchor" href="#4-进入配置工具选项菜单来配置编译固件的内容"></a> 4. 进入配置工具选项菜单来配置编译固件的内容</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make menuconfig<br></code></pre></td></tr></table></figure>
+<h2 id="5-编译"><a class="markdownIt-Anchor" href="#5-编译"></a> 5. 编译</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">make download -j $(<span class="hljs-built_in">nproc</span>) <span class="hljs-comment"># 下载编译所需的依赖</span><br>make -j $(<span class="hljs-built_in">nproc</span>) V=sc<br></code></pre></td></tr></table></figure>
+<p>如果是第一次编译，download这一步需要等待比较长的时间。</p>
+<p>编译过程可能会遇到的一些报错：</p>
+<ol>
+<li>
+<p><code>you should not run configure as root (set FORCE_UNSAFE_CONFIGURE=1 in environment to bypass this check)</code></p>
+<p>解决方法：<code>export FORCE_UNSAFE_CONFIGURE=1</code></p>
+</li>
+<li>
+<p><code>[Makefile:158: openwrt/build_dir/target-x86_64_musl/linux-x86_64/tmp/openwrt-x86-64-generic-squashfs-combined.vmdk] Error 1</code></p>
+<p>解决方法：<code>apt install qemu</code>，<code>apt install qemu-utils</code></p>
+</li>
+</ol>
+<h2 id="6-安装"><a class="markdownIt-Anchor" href="#6-安装"></a> 6. 安装</h2>
+<p>编译后会在<code>bin</code>目录下生成不同格式的固件。我们可以选择烧录在路由器、树莓派或x86主机/虚拟机上。</p>
+<h2 id="7-清理"><a class="markdownIt-Anchor" href="#7-清理"></a> 7. 清理</h2>
+<p>清除编译的可执行文件及配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make clean -j $(<span class="hljs-built_in">nproc</span>) V=s<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -354,7 +364,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%8A%98%E8%85%BE/" class="category-chain-item">折腾</a>
+  <a href="/categories/OpenWRT/" class="category-chain-item">OpenWRT</a>
   
   
 
@@ -369,9 +379,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/ChatGPT/">#ChatGPT</a>
-      
-        <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">#服务器</a>
+        <a href="/tags/Linux/">#Linux</a>
       
     </div>
   
@@ -383,8 +391,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>解决云服务器无法访问ChatGPT的问题</div>
-      <div>https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/</div>
+      <div>从源码编译OpenWRT系统</div>
+      <div>https://weijinkang.github.io/2023/06/04/build-openwrt/</div>
     </div>
     <div class="license-meta">
       
@@ -396,7 +404,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年5月17日</div>
+          <div>2023年6月4日</div>
         </div>
       
       
@@ -440,9 +448,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/06/04/build-openwrt/" title="从源码编译OpenWRT系统">
+                      <a href="/2023/07/31/netfilter-framework/" title="Netfilter框架">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">从源码编译OpenWRT系统</span>
+                        <span class="hidden-mobile">Netfilter框架</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -450,8 +458,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/05/15/enjoy-free-internet/" title="搭建免费的梯子">
-                        <span class="hidden-mobile">搭建免费的梯子</span>
+                      <a href="/2023/05/17/enjoy-chatgpt/" title="解决云服务器无法访问ChatGPT的问题">
+                        <span class="hidden-mobile">解决云服务器无法访问ChatGPT的问题</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -527,19 +535,6 @@
 
   
 
-
-
-  <script>
-  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
-    mermaid.initialize({});
-
-    Fluid.events.registerRefreshCallback(function() {
-      if ('mermaid' in window) {
-        mermaid.init();
-      }
-    });
-  });
-</script>
 
 
 

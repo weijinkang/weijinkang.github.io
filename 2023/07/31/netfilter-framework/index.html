@@ -18,25 +18,22 @@
   <meta name="author" content="Jinkang_Wei">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+    <meta name="description" content="一、 Netfilter简介 Netfilter为Linux内核中的数据包处理软件。其提供数据包过滤、网络地址（端口）转换、数据包内容标记、用户空间数据包排队和其它数据包管理功能，由此我们可以通过Netfilter构建有状态&#x2F;无状态的防火墙、共享同一个公网IP上网、帮助tc和iproute2系统构建复杂的QoS和策略路由等功能。 Netfilter所需的规则是存放在内存中的，iptables可以">
 <meta property="og:type" content="article">
-<meta property="og:title" content="解决云服务器无法访问ChatGPT的问题">
-<meta property="og:url" content="https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/index.html">
+<meta property="og:title" content="Netfilter框架">
+<meta property="og:url" content="https://weijinkang.github.io/2023/07/31/netfilter-framework/index.html">
 <meta property="og:site_name" content="Jinkang">
-<meta property="og:description" content="使用warp来绕过ChatGPT对某些云服务器IP的限制">
+<meta property="og:description" content="一、 Netfilter简介 Netfilter为Linux内核中的数据包处理软件。其提供数据包过滤、网络地址（端口）转换、数据包内容标记、用户空间数据包排队和其它数据包管理功能，由此我们可以通过Netfilter构建有状态&#x2F;无状态的防火墙、共享同一个公网IP上网、帮助tc和iproute2系统构建复杂的QoS和策略路由等功能。 Netfilter所需的规则是存放在内存中的，iptables可以">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
-<meta property="article:published_time" content="2023-05-17T13:41:56.000Z">
-<meta property="article:modified_time" content="2023-05-18T15:44:15.894Z">
+<meta property="article:published_time" content="2023-07-30T16:42:37.000Z">
+<meta property="article:modified_time" content="2023-07-30T18:33:18.537Z">
 <meta property="article:author" content="Jinkang_Wei">
-<meta property="article:tag" content="ChatGPT">
-<meta property="article:tag" content="服务器">
+<meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://weijinkang.github.io/img/enjoy-chatgpt.jpg">
   
   
   
-  <title>解决云服务器无法访问ChatGPT的问题 - Jinkang</title>
+  <title>Netfilter框架 - Jinkang</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -223,7 +220,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">解决云服务器无法访问ChatGPT的问题</span>
+            <span id="subtitle">Netfilter框架</span>
           
         </div>
 
@@ -234,8 +231,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-05-17 21:41" pubdate>
-          2023年5月17日 晚上
+        <time datetime="2023-07-31 00:42" pubdate>
+          2023年7月31日 凌晨
         </time>
       </span>
     
@@ -246,7 +243,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          1.3k 字
         
       </span>
     
@@ -257,7 +254,7 @@
         
         
         
-          18 分钟
+          12 分钟
         
       </span>
     
@@ -316,26 +313,77 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">解决云服务器无法访问ChatGPT的问题</h1>
+            <h1 style="display: none">Netfilter框架</h1>
             
             
               <div class="markdown-body">
                 
-                <p>很多人成功翻墙之后发现还是没法上ChatGPT，这很可能是因为ChatGPT限制了云服务器的IP造成的。</p>
-<p><img src="chatgpt_fail.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>要想解决这个问题，需要将云服务发到ChatGPT的数据再做一层封装。这层封装WARP可以帮我们完成。WARP是Cloudflare推出的一项网络加速服务，其设计的初衷是改善移动互联网的性能和安全性。大概的原理是客户端（此时的客户端是我们的云服务器）上来的流量经过WARP的加密封装后，自动寻找离客户端最近的Cloudflare网络的边缘节点，然后数据在该网络里路由到离服务器最近的边缘节点，最后解密后发给服务器端（也就是ChatGPT）。此时与ChatGPT交互报文的源IP不再是云服务器的IP，而是的Cloudflare边缘节点入口IP，而这个IP会被ChatGPT认为是一个普通的IP而不会遭到限制。</p>
-<p>所以解决方法是：从云服务器发出数据如果是发给ChatGPT的，那么把这个数据交给warp客户端再做一次代理，其它报文则正常转发。由于我的梯子是用v2ray搭的（见上一篇blog），所以接下来的教程是基于v2ray（其它梯子应该也差不多，理解了思想自己适配就好）。</p>
-<p>总体流程：</p>
-<p><img src="graph.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>搭建过程很简单，已经有人弄好了一键安装脚本（ <a target="_blank" rel="noopener" href="https://gitlab.com/rwkgyg/CFwarp">https://gitlab.com/rwkgyg/CFwarp</a> ），只需执行以下命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget -N https://gitlab.com/rwkgyg/CFwarp/raw/main/CFwarp.sh &amp;&amp; bash CFwarp.sh<br></code></pre></td></tr></table></figure>
-<p>按照提示进行下一步即可</p>
-<p><img src="warp_install.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>最后显示如下信息时表示warp已经搭建完成了，此时在云服务器命令行窗口出入<code>netstat -nlt</code>发现40000端口已经被warp监听了。</p>
-<p><img src="warp_install_successful.png" srcset="/img/loading.gif" lazyload alt="" /></p>
-<p>接下来是修改v2ray的配置文件<code>vim /usr/local/etc/v2ray/config.json</code>（想了解更多内容可参考<a target="_blank" rel="noopener" href="https://www.v2ray.com/">v2ray官方文档</a>）。要让访问ChatGPT的流量走warp代理，配置文件需要修改两个地方，一个是需要增加routing：让匹配到chat.openai.com的数据打上一个warp的outboundTag标签。未匹配到的打上default标签。另外一个是outbounds：带上warp标签的数据送到127.0.0.1:40000（也就是送给warp客户端），default标签的数据直接从云服务器转发出去。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;inbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">16832</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vmess&quot;</span><span class="hljs-punctuation">,</span>   <br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;clients&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>			<span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;uuid&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;alterId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;outbounds&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>	<span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;freedom&quot;</span><span class="hljs-punctuation">,</span>  <br>        <span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><span class="hljs-punctuation">&#125;</span><br>	<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;protocol&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;socks&quot;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;servers&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>				<span class="hljs-attr">&quot;address&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">40000</span><span class="hljs-punctuation">,</span><br>				<span class="hljs-attr">&quot;users&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><br>			<span class="hljs-punctuation">&#125;</span><br>			<span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;routing&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>		<span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;warp&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;domain&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;chat.openai.com&quot;</span><span class="hljs-punctuation">]</span><br>		<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>		<span class="hljs-punctuation">&#123;</span><br>			<span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;field&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;outboundTag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;default&quot;</span><span class="hljs-punctuation">,</span><br>			<span class="hljs-attr">&quot;network&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;udp,tcp&quot;</span><br>		<span class="hljs-punctuation">&#125;</span><br>		<span class="hljs-punctuation">]</span><br>	<span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
-<p>重启v2ray<code>systemctl restart v2ray</code>后就可以正常访问<a target="_blank" rel="noopener" href="https://chat.openai.com/">ChatGPT</a>啦！</p>
+                <h1 id="一-netfilter简介"><a class="markdownIt-Anchor" href="#一-netfilter简介"></a> 一、 Netfilter简介</h1>
+<p>Netfilter为Linux内核中的数据包处理软件。其提供数据包过滤、网络地址（端口）转换、数据包内容标记、用户空间数据包排队和其它数据包管理功能，由此我们可以通过Netfilter构建有状态/无状态的防火墙、共享同一个公网IP上网、帮助tc和iproute2系统构建复杂的QoS和策略路由等功能。</p>
+<p>Netfilter所需的规则是存放在内存中的，iptables可以对内存中的Netfilter规则执行添加、删除及修改等操作。</p>
+<h1 id="二-数据包的处理流程"><a class="markdownIt-Anchor" href="#二-数据包的处理流程"></a> 二、 数据包的处理流程</h1>
+<h1 id="三-四表五链"><a class="markdownIt-Anchor" href="#三-四表五链"></a> 三、 四表五链</h1>
+<p>用于过滤数据包的代码内置于内核中，并被组织成一系列的表，每个表都有特定的用途。这些表由一组预定义的链组成，这些链包含按顺序遍历的规则。每个规则由<strong>匹配条件</strong>(matches)和相应的<strong>操作</strong>（target）组成，如果匹配条件为真时，将会执行target的操作。</p>
+<h2 id="1-表tables"><a class="markdownIt-Anchor" href="#1-表tables"></a> 1. 表（Tables）</h2>
+<p>iptables包含四个表：</p>
+<ul>
+<li>raw：仅用于配置数据包，使其不受连接跟踪，加快数据包穿过防火墙的速度，提高性能</li>
+<li>filter：默认的表，通常与防火墙相关的所有操作都在其中发生</li>
+<li>nat：用于网络地址装换</li>
+<li>mangle：用于专门的数据包更改</li>
+</ul>
+<p>四个表的优先级：raw -&gt; mangle-&gt; nat -&gt; filter</p>
+<h2 id="2-链chains"><a class="markdownIt-Anchor" href="#2-链chains"></a> 2. 链（Chains）</h2>
+<p>表由链组成，链是按顺序遵循的规则列表。默认情况下，链中是没有任何规则的，</p>
+<p>规则链名包括(也被称为五个钩子函数（hook functions）)：</p>
+<ul>
+<li>
+<p><strong>INPUT链</strong> ：处理输入数据包</p>
+</li>
+<li>
+<p><strong>OUTPUT链</strong> ：处理输出数据包</p>
+</li>
+<li>
+<p><strong>FORWARD链</strong> ：处理转发数据包</p>
+</li>
+<li>
+<p><strong>PREROUTING链</strong> ：用于目标地址转换（DNAT）</p>
+</li>
+<li>
+<p><strong>POSTOUTING链</strong> ：用于源地址转换（SNAT）</p>
+</li>
+</ul>
+<h2 id="3-规则rules"><a class="markdownIt-Anchor" href="#3-规则rules"></a> 3. 规则（rules）</h2>
+<p>数据包过滤基于规则，<em>规则</em> 由多个<em>匹配条件</em>（数据包必须满足的条件才能应用规则）和一个<em>操作</em>（当数据包匹配所有条件时采取的操作）指定。</p>
+<p><strong>匹配条件</strong></p>
+<ul>
+<li>基本匹配条件：如源地址、目的地址</li>
+<li>扩展匹配条件：这些扩展条件也是netfilter的一部分，这件条件以模块的形式存在，如果想要使用这些条件，则需要依赖对应的扩展模块（<code>/lib/modules/kernel_version/kernel/net/nerfilter</code>）</li>
+</ul>
+<p><strong>操作</strong></p>
+<p>通过<code>-j</code>来跳转到该操作，操作可以是用户自定义的链、目标。</p>
+<ul>
+<li>
+<p>目标</p>
+<p>ACCEPT：允许防火墙接收数据包</p>
+<p>DROP：防火墙丢弃数据包</p>
+<p>RETURN：防火墙停止执行当前链中的后续规则，并返回到调用链中</p>
+<p>REJECT：阻拦数据包，并发送数据包通知对方</p>
+<p>MARK：将数据包打上某个标记</p>
+<p>SNAT/DNAT：改写封包源/目的IP为某特定IP或IP范围</p>
+<p>MASQUERADE： 改写数据包源IP为防火墙的接口IP</p>
+<p>LOG：日志记录</p>
+</li>
+<li>
+<p>自定义的链</p>
+<p>如果目标是内置目标，则立即决定数据包的命运，并停止当前表中数据包的处理。如果目标是用户定义的链，并且数据包的命运不是由第二条链决定的，则将根据原始链的其余规则进行过滤。</p>
+</li>
+</ul>
+<h2 id="4-模块"><a class="markdownIt-Anchor" href="#4-模块"></a> 4. 模块</h2>
+<p>有许多模块可用于扩展 iptables，例如 connlimit、conntrack、limit 和centre。这些模块添加了额外的功能以允许复杂的过滤规则。</p>
+<h1 id="四-实际配置"><a class="markdownIt-Anchor" href="#四-实际配置"></a> 四、实际配置</h1>
+<p>显示表中的所有规则</p>
+<p><code>iptables -t filter -S</code></p>
 
                 
               </div>
@@ -354,7 +402,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%8A%98%E8%85%BE/" class="category-chain-item">折腾</a>
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
   
   
 
@@ -369,9 +417,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/ChatGPT/">#ChatGPT</a>
-      
-        <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">#服务器</a>
+        <a href="/tags/Linux/">#Linux</a>
       
     </div>
   
@@ -383,8 +429,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>解决云服务器无法访问ChatGPT的问题</div>
-      <div>https://weijinkang.github.io/2023/05/17/enjoy-chatgpt/</div>
+      <div>Netfilter框架</div>
+      <div>https://weijinkang.github.io/2023/07/31/netfilter-framework/</div>
     </div>
     <div class="license-meta">
       
@@ -396,7 +442,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年5月17日</div>
+          <div>2023年7月31日</div>
         </div>
       
       
@@ -440,18 +486,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/06/04/build-openwrt/" title="从源码编译OpenWRT系统">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">从源码编译OpenWRT系统</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/05/15/enjoy-free-internet/" title="搭建免费的梯子">
-                        <span class="hidden-mobile">搭建免费的梯子</span>
+                      <a href="/2023/06/04/build-openwrt/" title="从源码编译OpenWRT系统">
+                        <span class="hidden-mobile">从源码编译OpenWRT系统</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -527,19 +567,6 @@
 
   
 
-
-
-  <script>
-  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
-    mermaid.initialize({});
-
-    Fluid.events.registerRefreshCallback(function() {
-      if ('mermaid' in window) {
-        mermaid.init();
-      }
-    });
-  });
-</script>
 
 
 
